@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab 1 - Word Count Using Hadoop MapReduce</title>
+<style>
+:root{--ink:#0d1b2a;--paper:#f5f3ee;--panel:#fff;--muted:#5b6672;--term:#0c1420;--accent:#c25a2b;--ok:#e2f5ea;--warn:#fff6e0}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Arial,sans-serif}.wrap{max-width:1160px;margin:auto;display:grid;grid-template-columns:220px 1fr}nav{position:sticky;top:0;height:100vh;background:var(--ink);padding:24px 16px}nav h2{font-size:.75rem;color:#b8c4d2}nav a{display:block;color:#cbd5df;text-decoration:none;padding:8px}main{padding:38px 42px 80px}h1,h2{color:#12355b}h1{font-size:2rem}h2{border-bottom:2px solid var(--ink);padding-bottom:6px;margin-top:32px}.lede,.why{color:var(--muted)}.step,.box{background:var(--panel);border:1px solid #ded8ca;border-radius:9px;padding:16px 19px;margin:14px 0}.warn{border-left:5px solid #c74735;background:var(--warn)}.ok{border-left:5px solid #0f6b3f;background:var(--ok)}.step-title{font-weight:bold}.s{display:inline-flex;width:27px;height:27px;border-radius:50%;background:var(--ink);color:#fff;align-items:center;justify-content:center;margin-right:8px}.cmd{background:var(--term);border-radius:8px;overflow:hidden;margin:12px 0}.bar{color:#b9c7d5;background:#09111a;padding:7px 11px;display:flex;justify-content:space-between}.cmd pre,.filebox pre{margin:0;padding:13px 15px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px Consolas,monospace}.cmd pre{color:#e1e9f1}.filebox{border:1px dashed #cfc9b8;border-radius:8px;overflow:hidden;margin:12px 0}.fname{background:#efe7fb;color:#6b3fb0;font-weight:bold;padding:8px 11px}.filebox pre{color:#17202a;background:#fbfaf6;font-size:12px}.copy,.download{padding:5px 11px;border-radius:5px;cursor:pointer;font-weight:bold}.copy{background:#17263a;color:#fff;border:1px solid #40526a}.download{background:var(--accent);color:#fff;border:1px solid #8f3e1e}.done{color:#7ee2a8!important}@media(max-width:800px){.wrap{display:block}nav{position:static;height:auto;display:flex;overflow:auto}nav h2{display:none}nav a{white-space:nowrap}main{padding:24px 16px}}@media print{nav{display:none}.wrap{display:block}main{padding:0}button{display:none}.step,.box,.cmd,.filebox{break-inside:avoid}}
+</style></head>
+<body><div class="wrap"><nav><h2>LAB 1</h2><a href="#image">Docker image</a><a href="#source">WordCount.java</a><a href="#run">Run</a><a href="#summary">Key points</a><a href="https://chatgpt.com/s/t_6aa414d95988819199aa8eba76179b0f" target="_blank" rel="noopener">GPT source</a></nav><main>
+<h1>Word Count Using Hadoop MapReduce</h1>
+<p class="lede">Complete Docker guide for a fresh Windows lab computer. Docker Desktop and internet access are the only Windows requirements.</p>
+<div class="box warn"><b>Image download/build time:</b> 8-15 minutes is normal because Ubuntu packages and Hadoop 3.3.6 are downloaded. Do not stop Docker during the build.</div>
+<h2>1. Create the folder</h2><div class="step"><div class="step-title"><span class="s">1</span>PowerShell</div><div class="cmd"><div class="bar">PowerShell <button class="copy">Copy</button></div><pre>New-Item -ItemType Directory -Force C:\bda-lab
+cd C:\bda-lab</pre></div></div>
+<h2 id="image">2. Build the Docker image</h2><div class="step"><div class="step-title"><span class="s">2</span>Download Dockerfile</div><p class="why">Click Download Dockerfile and save it as exactly <code>Dockerfile</code>, with no extension.</p><div class="filebox"><div class="fname">Dockerfile <button class="copy file-copy">Copy</button> <button class="download">Download Dockerfile</button></div><pre>FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update &amp;&amp; apt-get install -y \\
+    openjdk-8-jdk \\
+    wget \\
+    nano \\
+    vim \\
+    ssh \\
+    rsync \\
+    net-tools
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+RUN wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz &amp;&amp; \\
+    tar -xzf hadoop-3.3.6.tar.gz &amp;&amp; \\
+    mv hadoop-3.3.6 /opt/hadoop &amp;&amp; \\
+    rm hadoop-3.3.6.tar.gz
+ENV HADOOP_HOME=/opt/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+CMD ["/bin/bash"]</pre></div><div class="cmd"><div class="bar">PowerShell <button class="copy">Copy</button></div><pre>docker build --no-cache -t bda-hadoop .
+docker run --rm bda-hadoop bash -lc "java -version; javac -version; hadoop version"</pre></div><div class="box ok"><b>Checkpoint:</b> Java 8, javac, and Hadoop 3.3.6 must be shown.</div></div>
+<div class="step"><div class="step-title"><span class="s">3</span>Remove an old container</div><div class="cmd"><div class="bar">PowerShell <button class="copy">Copy</button></div><pre>docker rm -f hadoop 2&gt;$null</pre></div></div>
+<h2>3. Start Hadoop</h2><div class="step"><div class="step-title"><span class="s">4</span>Start container</div><div class="cmd"><div class="bar">PowerShell <button class="copy">Copy</button></div><pre>docker run -it --name hadoop bda-hadoop</pre></div></div><div class="step"><div class="step-title"><span class="s">5</span>Verify inside container</div><div class="cmd"><div class="bar">Container <button class="copy">Copy</button></div><pre>java -version
+javac -version
+hadoop version</pre></div></div>
+<h2 id="source">4. Use the exact WordCount.java source</h2><div class="step"><div class="step-title"><span class="s">6</span>Download or copy your program</div><p class="why">This is the exact Mapper, Reducer, Combiner, and Driver source you provided.</p><div class="filebox"><div class="fname">WordCount.java <button class="copy file-copy">Copy</button> <button class="download">Download WordCount.java</button></div><pre>import java.io.IOException;
+import java.util.StringTokenizer;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+    public static class TokenizerMapper
+        extends Mapper&lt;Object, Text, Text, IntWritable&gt; {
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+        public void map(Object key, Text value, Context context)
+            throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken().toLowerCase());
+                context.write(word, one);
+            }
+        }
+    }
+    public static class IntSumReducer
+        extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt; {
+        private IntWritable result = new IntWritable();
+        public void reduce(Text key, Iterable&lt;IntWritable&gt; values, Context context)
+            throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) sum += val.get();
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+    public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "word count");
+        job.setJarByClass(WordCount.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class);
+        job.setReducerClass(IntSumReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+}</pre></div><div class="cmd"><div class="bar">Container <button class="copy">Copy</button></div><pre>mkdir -p input
+printf '%s\n' 'the quick brown fox the lazy dog the fox' &gt; input/file1.txt
+printf '%s\n' 'a quick dog and a brown fox jumped' &gt; input/file2.txt
+export HADOOP_CLASSPATH=$(hadoop classpath)
+rm -rf classes wordcount.jar output
+mkdir classes
+javac -classpath "$HADOOP_CLASSPATH" -d classes WordCount.java
+jar -cvf wordcount.jar -C classes .</pre></div></div>
+<h2 id="run">5. Run WordCount</h2><div class="step"><div class="step-title"><span class="s">7</span>Execute and display output</div><div class="cmd"><div class="bar">Container <button class="copy">Copy</button></div><pre>hadoop jar wordcount.jar WordCount input output
+cat output/part-r-00000</pre></div><div class="box ok"><b>Expected:</b> a 2, and 1, brown 2, dog 2, fox 3, jumped 1, lazy 1, quick 2, the 3.</div></div>
+<div class="step"><div class="step-title"><span class="s">8</span>Run again safely</div><div class="cmd"><div class="bar">Container <button class="copy">Copy</button></div><pre>rm -rf output
+hadoop jar wordcount.jar WordCount input output</pre></div></div>
+<h2 id="summary">Purpose and key points</h2><div class="box"><b>Purpose:</b> Implement and execute Word Count using Hadoop MapReduce inside Docker.<ul><li>Mapper emits <code>(word, 1)</code>.</li><li>Shuffle and Sort groups equal words.</li><li>Reducer sums each word's values.</li><li>The Combiner reduces intermediate data.</li><li>Results are stored in <code>output/part-r-00000</code>.</li><li>Delete <code>output</code> before rerunning.</li></ul></div>
+<h2>6. Exit</h2><div class="cmd"><div class="bar">Container then PowerShell <button class="copy">Copy</button></div><pre>exit
+docker rm -f hadoop</pre></div>
+</main></div>
+<script>
+function copyText(b,t){var done=function(){b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent='Copy';b.classList.remove('done')},1200)};if(navigator.clipboard)navigator.clipboard.writeText(t).then(done);else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();done()}}
+document.querySelectorAll('.cmd').forEach(function(x){var b=x.querySelector('.copy');b.onclick=function(){copyText(b,x.querySelector('pre').textContent)}});
+document.querySelectorAll('.filebox').forEach(function(x){var p=x.querySelector('pre'),c=x.querySelector('.file-copy'),d=x.querySelector('.download');c.onclick=function(){copyText(c,p.textContent)};d.onclick=function(){var n=d.textContent.replace('Download ','');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([p.textContent],{type:'text/plain'}));a.download=n;a.click();URL.revokeObjectURL(a.href)}});
+</script></body></html>
