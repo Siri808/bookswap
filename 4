@@ -1,0 +1,80 @@
+
+# =====================================================
+# EXPERIMENT 4: BUFFER OVERFLOW ILLUSTRATION USING GCC
+# =====================================================
+
+# PURPOSE:
+# To understand buffer overflow vulnerabilities in C,
+# observe the effects of excessive input, and learn
+# secure memory handling and input validation.
+#
+# IMPORTANT:
+# The supplied lab program uses fgets(), which limits
+# input length. Therefore, its long-input test does not
+# actually cause a buffer overflow.
+
+# STEP 1: OPEN THE EDITOR
+nano buffer.c
+
+# In Nano, paste the C program from your lab manual.
+#
+# Save the file:
+# Press Ctrl + O, then Enter.
+# Exit the editor:
+# Press Ctrl + X.
+
+# STEP 2: COMPILE USING GCC
+gcc -g -fno-stack-protector -z execstack -o buffer buffer.c
+
+# COMMAND MEANING:
+# gcc                  = GNU C Compiler
+# -g                   = Include debugging information
+# -fno-stack-protector  = Disable stack-protection checks
+# -z execstack          = Request an executable stack
+# -o buffer             = Name the output executable "buffer"
+# buffer.c              = Input C source file
+
+# STEP 3: RUN THE PROGRAM
+./buffer
+
+# TEST 1: CORRECT PASSWORD
+# Enter: thegeekstuff
+# Expected: Correct Password
+#           Root privileges given to the user
+
+# TEST 2: INCORRECT PASSWORD
+# Run the program again:
+./buffer
+# Enter: hello
+# Expected: Wrong Password
+
+# TEST 3: LONG INPUT
+# Run the program again:
+./buffer
+# Enter: Hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+# Expected: Wrong Password
+# The supplied fgets() call limits stored input.
+
+# =====================================================
+# IMPORTANT CONCEPTS FOR VIVA
+# =====================================================
+# Buffer:
+# A fixed-size memory area used to store data.
+#
+# Buffer overflow:
+# Occurs when a program writes beyond a buffer's
+# allocated memory boundaries.
+#
+# fgets():
+# Reads input up to a specified limit.
+#
+# strcmp():
+# Compares two strings; returns 0 when they match.
+#
+# pass:
+# An integer flag set to 1 when the password matches.
+
+# Prevention:
+# Use bounded input, validate lengths, and enable
+# compiler security protections.
+# =====================================================
