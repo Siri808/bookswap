@@ -1,0 +1,37 @@
+Here is the text formatted to match a clean lab record style (complete with a structured reference table and your observation paragraph):
+
+---
+
+### **Compare It! Color Indications and Observations**
+
+#### **1. Color Code Reference Table**
+
+| Type | Color / Background | Meaning |
+| --- | --- | --- |
+| **Same** | White background | Text is identical in both files |
+| **Source only** | Green text, light green background | Text exists only in the source file |
+| **Target only** | Red text | Text exists only in the target file |
+| **Changed** | Blue text | Text differs between the two files |
+| **Virtual line** | Gray | Placeholder line used to align differences |
+| **Same in line** | Blue text | Matching portions within a compared line |
+| **Change in line** | Red text | Differing portions within a compared line |
+| **Merged** | Black text, sky-blue background | Merged content or merge-related display |
+| **Syntax keyword** | Blue | Programming-language keywords |
+| **Syntax comment** | Gray | Comments in source code |
+| **Syntax number/string** | Red | Numeric values and string literals |
+| **Syntax preprocessor** | Blue | Preprocessor directives |
+
+---
+
+#### **2. Important Distinctions**
+
+* **Source only (green):** The text occurs exclusively in the source file.
+* **Target only (red):** The text occurs exclusively in the target file.
+* **Changed (blue):** The corresponding text differs between the two files.
+* *Note:* "Source" and "target" refer to the two file panes and do not necessarily imply original and modified unless loaded in that specific order.
+
+---
+
+#### **3. Result for Your Experiment**
+
+> "The Compare It! tool compares two text files and uses different colors to distinguish identical, added, deleted, and modified content. Green indicates source-only text, red indicates target-only text, and blue indicates changed text. Gray virtual lines help align differences, making it easier to analyze changes and document potential evidence of file modification."
